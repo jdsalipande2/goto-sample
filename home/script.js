@@ -5,8 +5,16 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function fetchCategories() {
     let { data, error } = await supabase.from('category').select('*');
+    
+    console.log("Fetched Categories:", data, error); // Debugging line
+
     if (error) {
         console.error('Error fetching categories:', error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        console.warn("No categories found.");
         return;
     }
 
