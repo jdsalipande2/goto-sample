@@ -12,17 +12,19 @@
     <div id="menu-items" class="menu-container"></div>
 
     <script type="module">
-        // Initialize Supabase Client
+        // Correctly importing the supabase-js client from the CDN
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-        
+
+        // Supabase URL and API Key
         const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q"; // Keep this key secure in production!
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q"; // Use your actual key here
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Function to fetch categories from Supabase
-        async function fetchCategories() {
-            let { data: categories, error } = await supabase.from("category").select("*");
+        console.log("✅ Supabase Initialized", supabase);
 
+        // Fetch categories
+        async function fetchCategories() {
+            const { data: categories, error } = await supabase.from("category").select("*");
             if (error) {
                 console.error("Error fetching categories:", error);
                 return;
@@ -30,7 +32,7 @@
             displayCategories(categories);
         }
 
-        // Display categories on the webpage
+        // Display categories on the page
         function displayCategories(categories) {
             const categoriesContainer = document.getElementById("categories");
             categoriesContainer.innerHTML = "";
@@ -46,9 +48,9 @@
             });
         }
 
-        // Function to fetch menu items based on category
+        // Fetch menu items based on the selected category
         async function fetchMenuItems(categoryId) {
-            let { data: menuItems, error } = await supabase
+            const { data: menuItems, error } = await supabase
                 .from("menu")
                 .select("*")
                 .eq("category_id", categoryId)
@@ -61,7 +63,7 @@
             displayMenuItems(menuItems);
         }
 
-        // Display menu items on the webpage
+        // Display menu items on the page
         function displayMenuItems(menuItems) {
             const menuContainer = document.getElementById("menu-items");
             menuContainer.innerHTML = "";
@@ -78,6 +80,7 @@
                 menuContainer.appendChild(menuElement);
             });
 
+            // Handle add-to-cart button clicks
             document.querySelectorAll(".add-to-cart").forEach(button => {
                 button.addEventListener("click", (e) => {
                     const menuId = e.target.getAttribute("data-id");
@@ -86,12 +89,12 @@
             });
         }
 
-        // Add menu item to cart
+        // Log the addition of menu items to the cart
         function addToCart(menuId) {
-            console.log(`Item ${menuId} added to cart!`);
+            console.log(`🛒 Item ${menuId} added to cart!`);
         }
 
-        // Fetch categories when the page loads
+        // Call the function to fetch categories when the page loads
         fetchCategories();
     </script>
 </body>
