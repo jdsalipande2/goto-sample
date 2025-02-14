@@ -4,25 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Order System</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .category, .menu-item {
+            margin: 20px;
+            display: inline-block;
+            text-align: center;
+        }
+        .category img, .menu-item img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .category p, .menu-item p {
+            margin: 10px 0;
+        }
+        .add-to-cart {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .add-to-cart:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
+
     <h1>Food Order System</h1>
+
     <div id="categories" class="categories-container"></div>
     <div id="menu-items" class="menu-container"></div>
 
     <script type="module">
-        // Correctly importing the supabase-js client from the CDN
+        // Importing Supabase Client from CDN
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-        // Supabase URL and API Key
-        const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q"; // Use your actual key here
+        // Supabase initialization
+        const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co"; // Replace with your Supabase URL
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q"; // Replace with your actual Supabase API Key
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        console.log("✅ Supabase Initialized", supabase);
-
-        // Fetch categories
+        // Fetch Categories from Supabase
         async function fetchCategories() {
             const { data: categories, error } = await supabase.from("category").select("*");
             if (error) {
@@ -32,7 +60,7 @@
             displayCategories(categories);
         }
 
-        // Display categories on the page
+        // Display Categories on the Page
         function displayCategories(categories) {
             const categoriesContainer = document.getElementById("categories");
             categoriesContainer.innerHTML = "";
@@ -48,7 +76,7 @@
             });
         }
 
-        // Fetch menu items based on the selected category
+        // Fetch Menu Items from Supabase based on category
         async function fetchMenuItems(categoryId) {
             const { data: menuItems, error } = await supabase
                 .from("menu")
@@ -63,7 +91,7 @@
             displayMenuItems(menuItems);
         }
 
-        // Display menu items on the page
+        // Display Menu Items on the Page
         function displayMenuItems(menuItems) {
             const menuContainer = document.getElementById("menu-items");
             menuContainer.innerHTML = "";
@@ -80,7 +108,7 @@
                 menuContainer.appendChild(menuElement);
             });
 
-            // Handle add-to-cart button clicks
+            // Add event listeners to "Add to Cart" buttons
             document.querySelectorAll(".add-to-cart").forEach(button => {
                 button.addEventListener("click", (e) => {
                     const menuId = e.target.getAttribute("data-id");
@@ -89,12 +117,12 @@
             });
         }
 
-        // Log the addition of menu items to the cart
+        // Add Item to Cart (for demonstration)
         function addToCart(menuId) {
             console.log(`🛒 Item ${menuId} added to cart!`);
         }
 
-        // Call the function to fetch categories when the page loads
+        // Fetch Categories when the page loads
         fetchCategories();
     </script>
 </body>
