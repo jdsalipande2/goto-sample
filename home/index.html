@@ -12,90 +12,107 @@
     <div id="menu-items" class="menu-container"></div>
 
     <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        // Import the Supabase client from the CDN
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q";
+        const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co"; // Your Supabase URL
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q"; // Your Supabase Key (replace with the real key)
+        const supabase = createClient(supabaseUrl, supabaseKey); // Create the Supabase client
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    console.log("✅ Supabase Initialized:", supabase);
+        // Function to fetch categories from the 'category' table
+        async function fetchCategories() {
+            const { data: categories, error } = await supabase.from("category").select("*");
+            console.log("Fetched Categories:", categories); // Debug log to check the fetched data
 
-    // Fetch categories
-    async function fetchCategories() {
-    let { data: categories, error } = await supabase.from("category").select("*");
-    console.log("Raw categories data:", categories); // This will show the response data
-    console.error("Error fetching categories:", error); // This will log any errors
-    
-    if (error) {
-        return;
-    }
-    
-    if (categories && categories.length === 0) {
-        console.log("No categories found.");
-        return;
-    }
+            if (error) {
+                console.error("Error fetching categories:", error);
+                return;
+            }
 
-    displayCategories(categories);
-}
+            // Display categories if data is successfully fetched
+            if (categories && categories.length > 0) {
+                displayCategories(categories);
+            } else {
+                console.log("No categories found.");
+            }
+        }
 
-    function displayCategories(categories) {
-        const categoriesContainer = document.getElementById("categories");
-        categoriesContainer.innerHTML = "";
-        categories.forEach(category => {
-            let categoryElement = document.createElement("div");
-            categoryElement.classList.add("category");
-            categoryElement.innerHTML = `
-                <img src="${category.category_image}" alt="${category.category_name}">
-                <p>${category.category_name}</p>
-            `;
-            categoryElement.addEventListener("click", () => fetchMenuItems(category.category_id));
-            categoriesContainer.appendChild(categoryElement);
-        });
-    }
+        // Function to display categories in the HTML
+        function displayCategories(categories) {
+            const categoriesContainer = document.getElementById("categories");
+            categoriesContainer.innerHTML = ""; // Clear the container before displaying new data
 
-    async function fetchMenuItems(categoryId) {
-        try {
-            let { data: menuItems, error } = await supabase
+            categories.forEach(category => {
+                let categoryElement = document.createElement("div");
+                categoryElement.classList.add("category");
+                categoryElement.innerHTML = `
+                    <img src="${category.category_image}" alt="${category.category_name}" class="category-image">
+                    <p>${category.category_name}</p>
+                `;
+                // Add event listener to fetch menu items when a category is clicked
+                categoryElement.addEventListener("click", () => fetchMenuItems(category.category_id));
+                categoriesContainer.appendChild(categoryElement);
+            });
+        }
+
+        // Function to fetch menu items based on the category selected
+        async function fetchMenuItems(categoryId) {
+            const { data: menuItems, error } = await supabase
                 .from("menu")
                 .select("*")
                 .eq("category_id", categoryId)
-                .eq("menu_availability", "yes");
-            if (error) throw error;
-            displayMenuItems(menuItems);
-        } catch (err) {
-            console.error("❌ Error fetching menu items:", err.message);
+                .eq("menu_availability", "yes"); // Ensure only available menu items are fetched
+
+            console.log("Fetched Menu Items:", menuItems); // Debug log to check fetched menu items
+
+            if (error) {
+                console.error("Error fetching menu items:", error);
+                return;
+            }
+
+            // Display menu items if data is successfully fetched
+            if (menuItems && menuItems.length > 0) {
+                displayMenuItems(menuItems);
+            } else {
+                console.log("No menu items found for this category.");
+            }
         }
-    }
 
-    function displayMenuItems(menuItems) {
-        const menuContainer = document.getElementById("menu-items");
-        menuContainer.innerHTML = "";
-        menuItems.forEach(menu => {
-            let menuElement = document.createElement("div");
-            menuElement.classList.add("menu-item");
-            menuElement.innerHTML = `
-                <img src="${menu.menu_image}" alt="${menu.menu_name}">
-                <h3>${menu.menu_name}</h3>
-                <p>${menu.menu_description}</p>
-                <p>Price: $${menu.menu_price}</p>
-                <button class="add-to-cart" data-id="${menu.menu_id}">Add to Cart</button>
-            `;
-            menuContainer.appendChild(menuElement);
-        });
+        // Function to display menu items in the HTML
+        function displayMenuItems(menuItems) {
+            const menuContainer = document.getElementById("menu-items");
+            menuContainer.innerHTML = ""; // Clear the container before displaying new data
 
-        document.querySelectorAll(".add-to-cart").forEach(button => {
-            button.addEventListener("click", (e) => {
-                const menuId = e.target.getAttribute("data-id");
-                addToCart(menuId);
+            menuItems.forEach(menu => {
+                let menuElement = document.createElement("div");
+                menuElement.classList.add("menu-item");
+                menuElement.innerHTML = `
+                    <img src="${menu.menu_image}" alt="${menu.menu_name}" class="menu-image">
+                    <h3>${menu.menu_name}</h3>
+                    <p>${menu.menu_description}</p>
+                    <p>Price: $${menu.menu_price}</p>
+                    <button class="add-to-cart" data-id="${menu.menu_id}">Add to Cart</button>
+                `;
+                menuContainer.appendChild(menuElement);
             });
-        });
-    }
 
-    function addToCart(menuId) {
-        console.log(`🛒 Item ${menuId} added to cart!`);
-    }
+            // Add event listeners for the "Add to Cart" buttons
+            document.querySelectorAll(".add-to-cart").forEach(button => {
+                button.addEventListener("click", (e) => {
+                    const menuId = e.target.getAttribute("data-id");
+                    addToCart(menuId); // Placeholder function to handle the add-to-cart action
+                });
+            });
+        }
 
-    fetchCategories();
-</script>
+        // Function to handle the "Add to Cart" action
+        function addToCart(menuId) {
+            console.log(`🛒 Item ${menuId} added to cart!`);
+            // You can extend this function to manage the cart or store the cart items
+        }
+
+        // Fetch categories when the page loads
+        fetchCategories();
+    </script>
 </body>
 </html>
