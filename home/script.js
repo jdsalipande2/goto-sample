@@ -1,102 +1,152 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
-// 🔗 Connect to Supabase
-const SUPABASE_URL = "https://xnknxmmlfphomxixfgol.supabase.co";  // Replace with your Supabase URL
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua254bW1sZnBob214aXhmZ29sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MDkyMDIsImV4cCI6MjA1NTA4NTIwMn0.-iZuTbbKblvRpc3BWg07zSKyjPTA-O8n-Ql0uHPuckI";  // Replace with your Supabase Anon Key
+// Replace with your actual Supabase URL and anon key
+const SUPABASE_URL = 'https://xnknxmmlfphomxixfgol.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua254bW1sZnBob214aXhmZ29sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MDkyMDIsImV4cCI6MjA1NTA4NTIwMn0.-iZuTbbKblvRpc3BWg07zSKyjPTA-O8n-Ql0uHPuckI';
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let cart = [];
-
-// 🥘 Fetch Menu Items from Supabase
-async function fetchMenu() {
-    const { data, error } = await supabase.from("menu").select("*");
-    
+async function fetchCategories() {
+    let { data, error } = await supabase.from('category').select('*');
     if (error) {
-        console.error("Error fetching menu:", error);
+        console.error('Error fetching categories:', error);
         return;
     }
 
-    const menuContainer = document.getElementById("menu");
-    menuContainer.innerHTML = "";
+    const categoryContainer = document.getElementById('categories');
+    categoryContainer.innerHTML = ''; // Clear existing content
 
-    data.forEach(item => {
-        const itemDiv = document.createElement("div");
-        itemDiv.classList.add("menu-item");
-        itemDiv.innerHTML = `
-            <img src="${item.image_url}" alt="${item.name}">
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <p>₱${item.price}</p>
-            <button onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button>
+    data.forEach(category => {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.classList.add('category');
+        categoryDiv.innerHTML = `
+            <img src="${category.image}" alt="${category.name}">
+            <p>${category.name}</p>
         `;
-        menuContainer.appendChild(itemDiv);
+        categoryDiv.addEventListener('click', () => fetchMenuItems(category.id));
+        categoryContainer.appendChild(categoryDiv);
     });
 }
 
-// 🛒 Add Item to Cart
-window.addToCart = function(name, price) {
-    const existingItem = cart.find(item => item.name === name);
+fetchCategories();
 
+async function fetchMenuItems(categoryId) {
+    let { data, error } = await supabase
+        .from('menu')
+        .select('*')
+        .eq('category_id', categoryId);
+
+    if (error) {
+        console.error('Error fetching menu items:', error);
+        return;
+    }
+
+    const menuContainer = document.getElementById('menu-items');
+    menuContainer.innerHTML = ''; // Clear previous items
+
+    data.forEach(item => {
+        const menuItem = document.createElement('div');
+        menuItem.classList.add('menu-item');
+        menuItem.innerHTML = `
+            <img src="${item.image}" alt="${item.name}">
+            <h3>${item.name}</h3>
+            <p>${item.description}</p>
+            <p>₱${item.price}</p>
+            <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})">Add to Cart</button>
+        `;
+        menuContainer.appendChild(menuItem);
+    });
+}
+
+let cart = [];
+
+function addToCart(id, name, price) {
+    let existingItem = cart.find(item => item.id === id);
     if (existingItem) {
         existingItem.quantity++;
     } else {
-        cart.push({ name, price, quantity: 1 });
+        cart.push({ id, name, price, quantity: 1 });
     }
-
-    updateCart();
+    updateCartUI();
 }
 
-// 🔄 Update Cart UI
-function updateCart() {
-    const cartItems = document.getElementById("cart-items");
-    cartItems.innerHTML = "";
-
+function updateCartUI() {
+    const cartContainer = document.getElementById('cart-items');
+    cartContainer.innerHTML = '';
     let total = 0;
 
-    cart.forEach(item => {
+    cart.forEach((item, index) => {
         total += item.price * item.quantity;
-        cartItems.innerHTML += `
+        cartContainer.innerHTML += `
             <div>
-                <p>${item.name} x${item.quantity} - ₱${item.price * item.quantity}</p>
-                <button onclick="removeFromCart('${item.name}')">Remove</button>
+                <p>${item.name} - ₱${item.price} x ${item.quantity}</p>
+                <button onclick="removeFromCart(${index})">Remove</button>
             </div>
         `;
     });
 
-    document.getElementById("total-price").textContent = total;
+    document.getElementById('total-price').innerText = total;
 }
 
-// ❌ Remove Item from Cart
-window.removeFromCart = function(name) {
-    cart = cart.filter(item => item.name !== name);
-    updateCart();
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartUI();
 }
 
-// ✅ Checkout Order
-document.getElementById("checkout-btn").addEventListener("click", async function() {
-    if (cart.length === 0) {
-        alert("Your cart is empty!");
+function proceedToCheckout() {
+    document.getElementById('checkout-form').style.display = 'block';
+}
+
+async function placeOrder() {
+    const customer = {
+        first_name: document.getElementById('first-name').value,
+        last_name: document.getElementById('last-name').value,
+        contact: document.getElementById('contact').value,
+        email: document.getElementById('email').value,
+        address: document.getElementById('address').value,
+    };
+
+    let { data: customerData, error: customerError } = await supabase
+        .from('customer')
+        .insert([customer])
+        .select('id');
+
+    if (customerError) {
+        console.error('Error adding customer:', customerError);
         return;
     }
 
-    const orderData = {
-        items: cart,
-        total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-        method: "Pickup",
-        timestamp: new Date().toISOString()
-    };
+    const customerId = customerData[0].id;
 
-    const { data, error } = await supabase.from("orders").insert([orderData]);
+    let { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert([{ customer_id: customerId, total_price: cart.reduce((sum, item) => sum + item.price * item.quantity, 0) }])
+        .select('id');
 
-    if (error) {
-        console.error("Error placing order:", error);
-        alert("Failed to place order.");
-    } else {
-        alert("Order placed successfully!");
-        cart = [];
-        updateCart();
+    if (orderError) {
+        console.error('Error creating order:', orderError);
+        return;
     }
-});
 
-// 🔥 Load Menu on Page Load
-document.addEventListener("DOMContentLoaded", fetchMenu);
+    const orderId = orderData[0].id;
+
+    let orderItems = cart.map(item => ({
+        order_id: orderId,
+        menu_id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+    }));
+
+    let { error: orderItemsError } = await supabase
+        .from('order_item')
+        .insert(orderItems);
+
+    if (orderItemsError) {
+        console.error('Error adding order items:', orderItemsError);
+        return;
+    }
+
+    alert(`Thank you for ordering! Your order has been placed successfully.`);
+    cart = [];
+    updateCartUI();
+}
