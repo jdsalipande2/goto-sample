@@ -12,14 +12,15 @@
     <div id="menu-items" class="menu-container"></div>
 
     <script type="module">
-        // Import the Supabase client from the CDN
+        // Import the Supabase client
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+        // Initialize the Supabase client
         const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co"; // Your Supabase URL
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q"; // Your Supabase Key (replace with the real key)
+        const supabaseKey = "YOUR_SUPABASE_KEY"; // Your Supabase Key (replace with the real key)
         const supabase = createClient(supabaseUrl, supabaseKey); // Create the Supabase client
 
-        // Function to fetch categories from the 'category' table
+        // Fetch categories from the 'category' table
         async function fetchCategories() {
             const { data: categories, error } = await supabase.from("category").select("*");
             console.log("Fetched Categories:", categories); // Debug log to check the fetched data
@@ -37,7 +38,7 @@
             }
         }
 
-        // Function to display categories in the HTML
+        // Display categories in the HTML
         function displayCategories(categories) {
             const categoriesContainer = document.getElementById("categories");
             categoriesContainer.innerHTML = ""; // Clear the container before displaying new data
@@ -55,7 +56,7 @@
             });
         }
 
-        // Function to fetch menu items based on the category selected
+        // Fetch menu items based on the category selected
         async function fetchMenuItems(categoryId) {
             const { data: menuItems, error } = await supabase
                 .from("menu")
@@ -78,7 +79,7 @@
             }
         }
 
-        // Function to display menu items in the HTML
+        // Display menu items in the HTML
         function displayMenuItems(menuItems) {
             const menuContainer = document.getElementById("menu-items");
             menuContainer.innerHTML = ""; // Clear the container before displaying new data
