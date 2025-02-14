@@ -22,14 +22,21 @@
 
     // Fetch categories
     async function fetchCategories() {
-        let { data: categories, error } = await supabase.from("category").select("*");
-        console.log("Fetched Categories:", categories);
-        if (error) {
-            console.error("❌ Error fetching categories:", error);
-            return;
-        }
-        displayCategories(categories);
+    let { data: categories, error } = await supabase.from("category").select("*");
+    console.log("Raw categories data:", categories); // This will show the response data
+    console.error("Error fetching categories:", error); // This will log any errors
+    
+    if (error) {
+        return;
     }
+    
+    if (categories && categories.length === 0) {
+        console.log("No categories found.");
+        return;
+    }
+
+    displayCategories(categories);
+}
 
     function displayCategories(categories) {
         const categoriesContainer = document.getElementById("categories");
