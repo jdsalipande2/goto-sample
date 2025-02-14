@@ -5,27 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Order System</title>
     <link rel="stylesheet" href="styles.css">
-    <script defer src="https://unpkg.com/@supabase/supabase-js"></script>
-    <script defer src="script.js"></script>
 </head>
 <body>
     <h1>Food Order System</h1>
     <div id="categories" class="categories-container"></div>
     <div id="menu-items" class="menu-container"></div>
 
-    <script>
+    <script defer src="https://unpkg.com/@supabase/supabase-js"></script>
+<script defer>
+    document.addEventListener("DOMContentLoaded", async () => {
+        // Initialize Supabase
         const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q";  
+        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q";
         const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // Fetch categories
         async function fetchCategories() {
-            try {
-                let { data: categories, error } = await supabase.from("category").select("*");
-                if (error) throw error;
-                displayCategories(categories);
-            } catch (err) {
-                console.error("Error fetching categories:", err.message);
+            let { data: categories, error } = await supabase.from("category").select("*");
+
+            console.log("Fetched Categories:", categories); // Debugging
+            if (error) {
+                console.error("Error fetching categories:", error);
+                return;
             }
+            displayCategories(categories);
         }
 
         function displayCategories(categories) {
@@ -88,6 +91,7 @@
         }
 
         fetchCategories();
-    </script>
+    });
+</script>
 </body>
 </html>
