@@ -3,25 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order System</title>
+    <title>Restaurant Order System</title>
     <link rel="stylesheet" href="styles.css">
-    <script type="module" defer src="script.js"></script>
 </head>
 <body>
-
-    <h1>Order System</h1>
-
-    <div id="menu-container">
+    <header>
+        <h1>Restaurant Ordering System</h1>
+    </header>
+    
+    <section id="categories">
+        <h2>Categories</h2>
+        <div class="category-list"></div>
+    </section>
+    
+    <section id="menu-items" style="display: none;">
         <h2>Menu</h2>
-        <div id="menu"></div>
-    </div>
-
-    <div id="cart-container">
-        <h2>Cart</h2>
-        <div id="cart-items"></div>
-        <p>Total: ₱<span id="total-price">0</span></p>
-        <button id="checkout-btn">Checkout</button>
-    </div>
-
+        <div class="menu-list"></div>
+    </section>
+    
+    <section id="cart">
+        <h2>Order Summary</h2>
+        <div class="cart-items"></div>
+        <p>Total: <span id="total-price">₱0.00</span></p>
+        <button id="checkout-btn">Proceed to Checkout</button>
+    </section>
+    
+    <section id="checkout" style="display: none;">
+        <h2>Checkout</h2>
+        <form id="checkout-form">
+            <label>First Name: <input type="text" id="first-name" required></label>
+            <label>Last Name: <input type="text" id="last-name" required></label>
+            <label>Contact Number: <input type="text" id="contact-number" required></label>
+            <label>Email: <input type="email" id="email" required></label>
+            <label>Address: <input type="text" id="address" required></label>
+            
+            <label>Order Type:
+                <select id="order-type">
+                    <option value="Delivery">Delivery</option>
+                    <option value="Pick-up">Pick-up</option>
+                </select>
+            </label>
+            
+            <label>Payment Method:
+                <select id="payment-method">
+                    <option value="GCash">GCash</option>
+                    <option value="Cash">Cash</option>
+                </select>
+            </label>
+            
+            <button type="submit">Place Order</button>
+        </form>
+    </section>
+    
+    <script src="script.js"></script>
 </body>
 </html>
