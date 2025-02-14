@@ -1,5 +1,3 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js';
-
 const SUPABASE_URL = 'https://xnknxmmlfphomxixfgol.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua254bW1sZnBob214aXhmZ29sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MDkyMDIsImV4cCI6MjA1NTA4NTIwMn0.-iZuTbbKblvRpc3BWg07zSKyjPTA-O8n-Ql0uHPuckI';
 
