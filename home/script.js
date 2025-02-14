@@ -1,6 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js';
 
-// Replace with your actual Supabase URL and anon key
 const SUPABASE_URL = 'https://xnknxmmlfphomxixfgol.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua254bW1sZnBob214aXhmZ29sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MDkyMDIsImV4cCI6MjA1NTA4NTIwMn0.-iZuTbbKblvRpc3BWg07zSKyjPTA-O8n-Ql0uHPuckI';
 
@@ -14,7 +13,7 @@ async function fetchCategories() {
     }
 
     const categoryContainer = document.getElementById('categories');
-    categoryContainer.innerHTML = ''; // Clear existing content
+    categoryContainer.innerHTML = '';
 
     data.forEach(category => {
         const categoryDiv = document.createElement('div');
@@ -31,31 +30,33 @@ async function fetchCategories() {
 fetchCategories();
 
 async function fetchMenuItems(categoryId) {
-    let { data, error } = await supabase
-        .from('menu')
-        .select('*')
-        .eq('category_id', categoryId);
-
+    let { data, error } = await supabase.from('menu').select('*').eq('category_id', categoryId);
     if (error) {
         console.error('Error fetching menu items:', error);
         return;
     }
 
     const menuContainer = document.getElementById('menu-items');
-    menuContainer.innerHTML = ''; // Clear previous items
+    menuContainer.innerHTML = '';
 
-    data.forEach(item => {
-        const menuItem = document.createElement('div');
-        menuItem.classList.add('menu-item');
-        menuItem.innerHTML = `
-            <img src="${item.image}" alt="${item.name}">
-            <h3>${item.name}</h3>
-            <p>${item.description}</p>
-            <p>₱${item.price}</p>
-            <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})">Add to Cart</button>
-        `;
-        menuContainer.appendChild(menuItem);
-    });
+    if (data.length === 0) {
+        menuContainer.innerHTML = '<p>No items available for this category.</p>';
+    } else {
+        data.forEach(item => {
+            const menuItem = document.createElement('div');
+            menuItem.classList.add('menu-item');
+            menuItem.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <h3>${item.name}</h3>
+                <p>${item.description}</p>
+                <p>₱${item.price}</p>
+                <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})">Add to Cart</button>
+            `;
+            menuContainer.appendChild(menuItem);
+        });
+    }
+
+    document.getElementById('menu-section').style.display = 'block';
 }
 
 let cart = [];
@@ -75,12 +76,12 @@ function updateCartUI() {
     cartContainer.innerHTML = '';
     let total = 0;
 
-    cart.forEach((item, index) => {
+    cart.forEach(item => {
         total += item.price * item.quantity;
         cartContainer.innerHTML += `
             <div>
                 <p>${item.name} - ₱${item.price} x ${item.quantity}</p>
-                <button onclick="removeFromCart(${index})">Remove</button>
+                <button onclick="removeFromCart(${item.id})">Remove</button>
             </div>
         `;
     });
@@ -88,13 +89,17 @@ function updateCartUI() {
     document.getElementById('total-price').innerText = total;
 }
 
-function removeFromCart(index) {
-    cart.splice(index, 1);
+function removeFromCart(id) {
+    cart = cart.filter(item => item.id !== id);
     updateCartUI();
 }
 
 function proceedToCheckout() {
     document.getElementById('checkout-form').style.display = 'block';
+}
+
+function validateInputs(customer) {
+    return Object.values(customer).every(value => value.trim() !== "");
 }
 
 async function placeOrder() {
@@ -105,6 +110,11 @@ async function placeOrder() {
         email: document.getElementById('email').value,
         address: document.getElementById('address').value,
     };
+
+    if (!validateInputs(customer)) {
+        alert("Please fill in all details before placing an order.");
+        return;
+    }
 
     let { data: customerData, error: customerError } = await supabase
         .from('customer')
@@ -137,10 +147,7 @@ async function placeOrder() {
         price: item.price,
     }));
 
-    let { error: orderItemsError } = await supabase
-        .from('order_item')
-        .insert(orderItems);
-
+    let { error: orderItemsError } = await supabase.from('order_item').insert(orderItems);
     if (orderItemsError) {
         console.error('Error adding order items:', orderItemsError);
         return;
