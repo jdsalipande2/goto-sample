@@ -5,93 +5,102 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Order System</title>
     <link rel="stylesheet" href="styles.css">
+    <script defer src="https://unpkg.com/@supabase/supabase-js"></script>
 </head>
 <body>
     <h1>Food Order System</h1>
     <div id="categories" class="categories-container"></div>
     <div id="menu-items" class="menu-container"></div>
 
-    <script defer src="https://unpkg.com/@supabase/supabase-js"></script>
-<script defer>
-    document.addEventListener("DOMContentLoaded", async () => {
-        // Initialize Supabase
-        const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co";
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q";
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            console.log("DOM fully loaded");
 
-        // Fetch categories
-        async function fetchCategories() {
-            let { data: categories, error } = await supabase.from("category").select("*");
-
-            console.log("Fetched Categories:", categories); // Debugging
-            if (error) {
-                console.error("Error fetching categories:", error);
+            // ✅ Ensure Supabase is available
+            if (!window.supabase) {
+                console.error("Supabase is not loaded yet!");
                 return;
             }
-            displayCategories(categories);
-        }
 
-        function displayCategories(categories) {
-            const categoriesContainer = document.getElementById("categories");
-            categoriesContainer.innerHTML = "";
-            categories.forEach(category => {
-                let categoryElement = document.createElement("div");
-                categoryElement.classList.add("category");
-                categoryElement.innerHTML = `
-                    <img src="${category.category_image}" alt="${category.category_name}">
-                    <p>${category.category_name}</p>
-                `;
-                categoryElement.addEventListener("click", () => fetchMenuItems(category.category_id));
-                categoriesContainer.appendChild(categoryElement);
-            });
-        }
+            // Initialize Supabase
+            const supabaseUrl = "https://imsoflqfoidojyxfmtth.supabase.co";
+            const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imltc29mbHFmb2lkb2p5eGZtdHRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk1MjAzNTIsImV4cCI6MjA1NTA5NjM1Mn0.CIp76CD--eg-1p2YKZ3VAxDqbz4ByakcqI_e-Z7D48Q";
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function fetchMenuItems(categoryId) {
-            try {
-                let { data: menuItems, error } = await supabase
-                    .from("menu")
-                    .select("*")
-                    .eq("category_id", categoryId)
-                    .eq("menu_availability", "yes");
-                if (error) throw error;
-                displayMenuItems(menuItems);
-            } catch (err) {
-                console.error("Error fetching menu items:", err.message);
+            // Fetch categories
+            async function fetchCategories() {
+                let { data: categories, error } = await supabase.from("category").select("*");
+
+                console.log("Fetched Categories:", categories); // Debugging
+                if (error) {
+                    console.error("Error fetching categories:", error);
+                    return;
+                }
+                displayCategories(categories);
             }
-        }
 
-        function displayMenuItems(menuItems) {
-            const menuContainer = document.getElementById("menu-items");
-            menuContainer.innerHTML = "";
-            menuItems.forEach(menu => {
-                let menuElement = document.createElement("div");
-                menuElement.classList.add("menu-item");
-                menuElement.innerHTML = `
-                    <img src="${menu.menu_image}" alt="${menu.menu_name}">
-                    <h3>${menu.menu_name}</h3>
-                    <p>${menu.menu_description}</p>
-                    <p>Price: $${menu.menu_price}</p>
-                    <button class="add-to-cart" data-id="${menu.menu_id}">Add to Cart</button>
-                `;
-                menuContainer.appendChild(menuElement);
-            });
-
-            // Attach event listeners dynamically
-            document.querySelectorAll(".add-to-cart").forEach(button => {
-                button.addEventListener("click", (e) => {
-                    const menuId = e.target.getAttribute("data-id");
-                    addToCart(menuId);
+            function displayCategories(categories) {
+                const categoriesContainer = document.getElementById("categories");
+                categoriesContainer.innerHTML = "";
+                categories.forEach(category => {
+                    let categoryElement = document.createElement("div");
+                    categoryElement.classList.add("category");
+                    categoryElement.innerHTML = `
+                        <img src="${category.category_image}" alt="${category.category_name}">
+                        <p>${category.category_name}</p>
+                    `;
+                    categoryElement.addEventListener("click", () => fetchMenuItems(category.category_id));
+                    categoriesContainer.appendChild(categoryElement);
                 });
-            });
-        }
+            }
 
-        function addToCart(menuId) {
-            console.log(`Item ${menuId} added to cart!`);
-            // Implement cart logic here...
-        }
+            async function fetchMenuItems(categoryId) {
+                try {
+                    let { data: menuItems, error } = await supabase
+                        .from("menu")
+                        .select("*")
+                        .eq("category_id", categoryId)
+                        .eq("menu_availability", "yes");
 
-        fetchCategories();
-    });
-</script>
+                    if (error) throw error;
+                    displayMenuItems(menuItems);
+                } catch (err) {
+                    console.error("Error fetching menu items:", err.message);
+                }
+            }
+
+            function displayMenuItems(menuItems) {
+                const menuContainer = document.getElementById("menu-items");
+                menuContainer.innerHTML = "";
+                menuItems.forEach(menu => {
+                    let menuElement = document.createElement("div");
+                    menuElement.classList.add("menu-item");
+                    menuElement.innerHTML = `
+                        <img src="${menu.menu_image}" alt="${menu.menu_name}">
+                        <h3>${menu.menu_name}</h3>
+                        <p>${menu.menu_description}</p>
+                        <p>Price: $${menu.menu_price}</p>
+                        <button class="add-to-cart" data-id="${menu.menu_id}">Add to Cart</button>
+                    `;
+                    menuContainer.appendChild(menuElement);
+                });
+
+                // Attach event listeners dynamically
+                document.querySelectorAll(".add-to-cart").forEach(button => {
+                    button.addEventListener("click", (e) => {
+                        const menuId = e.target.getAttribute("data-id");
+                        addToCart(menuId);
+                    });
+                });
+            }
+
+            function addToCart(menuId) {
+                console.log(`Item ${menuId} added to cart!`);
+                // Implement cart logic here...
+            }
+
+            fetchCategories();
+        });
+    </script>
 </body>
 </html>
