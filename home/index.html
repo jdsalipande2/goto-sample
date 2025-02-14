@@ -11,50 +11,37 @@
         <h1>Restaurant Ordering System</h1>
     </header>
     
-    <section id="categories">
+    <section id="categories-section">
         <h2>Categories</h2>
-        <div class="category-list"></div>
+        <div id="categories"></div> <!-- Fixed duplicate ID issue -->
     </section>
     
-    <section id="menu-items" style="display: none;">
+    <section id="menu-section" style="display: none;">
         <h2>Menu</h2>
-        <div class="menu-list"></div>
+        <div id="menu-items"></div> <!-- Fixed duplicate ID issue -->
     </section>
     
-    <section id="cart">
+    <div id="cart">
         <h2>Order Summary</h2>
-        <div class="cart-items"></div>
-        <p>Total: <span id="total-price">₱0.00</span></p>
-        <button id="checkout-btn">Proceed to Checkout</button>
-    </section>
+        <div id="cart-items"></div>
+        <p>Total: ₱<span id="total-price">0</span></p>
+        <button onclick="proceedToCheckout()">Proceed to Checkout</button>
+    </div>
     
-    <section id="checkout" style="display: none;">
+    <div id="checkout-form" style="display:none;">
         <h2>Checkout</h2>
-        <form id="checkout-form">
-            <label>First Name: <input type="text" id="first-name" required></label>
-            <label>Last Name: <input type="text" id="last-name" required></label>
-            <label>Contact Number: <input type="text" id="contact-number" required></label>
-            <label>Email: <input type="email" id="email" required></label>
-            <label>Address: <input type="text" id="address" required></label>
-            
-            <label>Order Type:
-                <select id="order-type">
-                    <option value="Delivery">Delivery</option>
-                    <option value="Pick-up">Pick-up</option>
-                </select>
-            </label>
-            
-            <label>Payment Method:
-                <select id="payment-method">
-                    <option value="GCash">GCash</option>
-                    <option value="Cash">Cash</option>
-                </select>
-            </label>
-            
-            <button type="submit">Place Order</button>
-        </form>
-    </section>
-    
+        <input type="text" id="first-name" placeholder="First Name">
+        <input type="text" id="last-name" placeholder="Last Name">
+        <input type="text" id="contact" placeholder="Contact Number">
+        <input type="email" id="email" placeholder="Email">
+        <input type="text" id="address" placeholder="Address">
+        <select id="payment-method">
+            <option value="gcash">Gcash</option>
+            <option value="cash">Cash</option>
+        </select>
+        <button onclick="placeOrder()">Place Order</button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
